@@ -69,7 +69,7 @@ def update_movies(id: int, movie: Movie): # Nuevamente instauramos el objeto 'mo
             item['overview'] = movie.overview
             item['year'] = movie.year
             item['rating'] = movie.rating
-            item['category'] = movie.category
+            item['category'] = movie.category 
             return movies
     return 'ID invalido'
 
