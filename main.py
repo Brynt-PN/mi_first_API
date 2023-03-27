@@ -1,4 +1,4 @@
-from fastapi import FastAPI # Aqui importamos FastAPI (es una clase)
+from fastapi import FastAPI, Body # Aqui importamos FastAPI (es una clase) y Tambien BODY nos ayuda a definir que variables que son parte de una solicitud POST
 from fastapi.responses import HTMLResponse # Importamos para poder devolver un HTML
 
 app = FastAPI() # Instanciamos (Crear un OBJ a partir de una CLASS), que sera nuestra APP
@@ -48,3 +48,59 @@ def get_movie(id: int): # Indicamos que el ID debe ser un INT (Entero)
         if item['id'] == id:# Verificamos si el valor de la clave 'id' coincide con el valor del parámetro 'id' proporcionado
             return item # Retornamos el ITEM que seria el dicciónario correspondiente
     return 'ID invalido'
+
+# Definimos una ruta para la API que recibe una categoría de película y devuelve una lista de todas las películas en esa categoría
+@app.get('/movies/', tags=['MOVIES'])
+def get_movies_by_category(category: str):
+    # Usamos una lista de comprensión para iterar sobre cada elemento de la lista de películas y devolver solo aquellos cuya categoría coincida con la proporcionada
+    return [item for item in movies if item['category'] == category]
+
+# Definimos una ruta para el metodo POST, para poder agregar una registro a la lista
+@app.post('/movies', tags=['MOVIES'])
+# Aqui los parametros deben venir con la petición como parte del cuerpo que se agregaran al registro
+def create_movie(id: int = Body(), title: str = Body(), overview: str = Body(), year: int = Body(), rating: float = Body(),category: str = Body()): # Usamos BODY para definir que parametros son parte del cuerpo de la solicitud POST
+    movies.append(
+        {
+        'id': id,
+        'title': title,
+        'overview': overview,
+        'year': year,
+        'rating': rating,
+        'category': category    
+    } 
+    ) # Aqui añadimos a la lista el nuevo registro utilizando los parametros
+    return movies
+
+# Definimos una ruta para el metodo PUT, para actualizar un registro de nuestra lista
+@app.put('/movies/{id}', tags=['MOVIES'])
+# A diferencia del anterior aqui para identificar el registro a actualizar usamos el paraetro ID, por eso si se tiene como parametro requerido fuera del cuerpo de la solicitud.
+def update_movies(id: int, title: str = Body(), overview: str = Body(), year: int = Body(), rating: float = Body(),category: str = Body()):
+    for item in movies: # Iteramos la lista hasta encontrar el registro correspondiente y actualizamos sis valores
+        if item['id'] == id: # OBS: '==' para comparativa '=' para asignar valor
+            item['title'] = title
+            item['overview'] = overview
+            item['year'] = year
+            item['rating'] = rating
+            item['category'] = category
+            return movies
+    return 'ID invalido'
+
+# Definimos una ruta para el método DELETE que elimina un registro de nuestra lista en función de su ID
+@app.delete('/movie{id}', tags=['MOVIES'])
+def delete_movie(id: int):
+    for item in movies: # Iteramos sobre la lista de películas para encontrar el registro correspondiente
+        if item['id'] == id: # Si encontramos el registro, lo eliminamos de la lista de películas y devolvemos la lista actualizada
+            movies.remove(item)
+            return movies
+    return 'ID invalido' # Si el ID proporcionado no coincide con ningún registro en la lista, devolvemos un mensaje de error
+
+
+
+
+
+
+
+
+
+
+
