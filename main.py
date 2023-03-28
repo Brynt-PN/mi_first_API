@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Body 
 from fastapi.responses import HTMLResponse 
 from pydantic import BaseModel, Field # Importamos BASEMODEL para poder hacer esquemas (Crear clases que ereden caracteristicas de un MODELO BASE)
+# FIELD es para hacer validaciones.
 from typing import Optional # Importamos para poder indicar que hay valores opcionales
 
 app = FastAPI() 
@@ -11,9 +12,9 @@ app.version = '0.0.1'
 # Creamos una clase para los Objetos MOVIE, que ereda de BASEMODEL (Modelo Base)
 class Movie(BaseModel):# Luego indicamos las caracteristicas de esta clase (Asi ahorramos codigo mas adelante en POST Y DELET)
     id: Optional[int] = None # Con OPTIONAL indicamos que el ID es un valor que puede ser Opcional, con '[int]' indicamos su valor entero y con '= None' decimos que su valor predeterminado es NULO
-    title: str = Field(default= 'Mi Pelicula', min_length= 5, max_length= 15)
+    title: str = Field(default= 'Mi Pelicula', min_length= 5, max_length= 15) # Con 'Field' podemos pasar validaciones como datos, por ejemplo, colocar un dato por defecto y tambuen un minimo y máximo de caracteres.
     overview: str = Field(default= 'Descripción de la Pelicula', min_length= 15, max_length= 50)
-    year: int = Field(default= '2022', le= 2022)
+    year: int = Field(default= '2022', le= 2022) #Para el caso de definir un rango en valores INT (Enteros) usamos 'LE'
     rating: float = Field(default= 'Ratio',le= 9.9)
     category: str
 
