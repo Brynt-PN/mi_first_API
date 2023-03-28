@@ -10,7 +10,7 @@ app.version = '0.0.1'
 
 # Creamos una clase para los Objetos MOVIE, que ereda de BASEMODEL (Modelo Base)
 class Movie(BaseModel):# Luego indicamos las caracteristicas de esta clase (Asi ahorramos codigo mas adelante en POST Y DELET)
-    id: Optional[int] = None # Con OPTIONAL indicamos que el ID es un valor que puede ser Opcional, con '[int]' indicamos su valor entreto y con '= None' decimos que su valor predeterminado es NULO
+    id: Optional[int] = None # Con OPTIONAL indicamos que el ID es un valor que puede ser Opcional, con '[int]' indicamos su valor entero y con '= None' decimos que su valor predeterminado es NULO
     title: str
     overview: str
     year: int
