@@ -56,7 +56,7 @@ movies = [
 ]
 
 
-@app.get('/movies',tags=['MOVIES'], response_model = List[Movie]) 
+@app.get('/movies',tags=['MOVIES'], status_code=200, response_model=List[Movie]) #Podemos añadir el 'codigo de estado' que queremos que ejecute esta petición cunado se procese bien
 def get_movies():
     return JSONResponse(content=movies) 
 
@@ -65,7 +65,7 @@ def get_movie(id: int = Path(ge=1,le=2000)) -> Movie:
     for item in movies:
         if item['id'] == id:
             return JSONResponse(content=item) 
-    return JSONResponse(content='ID invalido')
+    return JSONResponse(status_code = 404, content='ID invalido')
 
 @app.get('/movies/', tags=['MOVIES'], response_model = List[Movie])
 def get_movies_by_category(category: str =  Query(min_length = 5, max_length =15 )):
@@ -76,9 +76,9 @@ def get_movies_by_category(category: str =  Query(min_length = 5, max_length =15
 def create_movie(movie: Movie): 
 
     movies.append(movie) 
-    return JSONResponse(content= {'message':'Se ha registrado la pelicula'})
+    return JSONResponse(status_code = 201, content= {'message':'Se ha registrado la pelicula'}) #Tambien podemos indica el 'codigo de estado' desde la respuesta
 
-@app.put('/movies/{id}', tags=['MOVIES'], response_model= dict)
+@app.put('/movies/{id}', tags=['MOVIES'], response_model= dict, status_code = 200)
 def update_movies(id: int, movie: Movie): 
     for item in movies: 
         if item['id'] == id: 
@@ -88,15 +88,15 @@ def update_movies(id: int, movie: Movie):
             item['rating'] = movie.rating
             item['category'] = movie.category 
             return JSONResponse(content= {'message':'Se ha modificado la pelicula'})
-    return 'ID invalido'
+    return JSONResponse(status_code = 404, content='ID invalido')
 
-@app.delete('/movie{id}', tags=['MOVIES'], response_model= dict)
+@app.delete('/movie{id}', tags=['MOVIES'], response_model= dict, status_code = 200)
 def delete_movie(id: int):
     for item in movies: 
         if item['id'] == id: 
             movies.remove(item)
             return JSONResponse(content= {'message':'Se ha eliminado la pelicula'})
-    return 'ID invalido' 
+    return JSONResponse(status_code = 404, content='ID invalido')
 
 
 
