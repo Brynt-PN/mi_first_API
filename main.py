@@ -1,9 +1,9 @@
 #CODIGO COMENTADO DE INTRODUCCIÓN EN LA RAMA INT
-from fastapi import FastAPI, Body 
-from fastapi.responses import HTMLResponse 
+from fastapi import FastAPI, Body, Path, Query #PATH nos ayuda a Validar los parametros (Tambien es una Clase (CLASS)). Tambien importamos Query.
+from fastapi.responses import HTMLResponse, JSONResponse # Importamos JSONResponse, para devolver las respuestas en formato Json
 from pydantic import BaseModel, Field # Importamos BASEMODEL para poder hacer esquemas (Crear clases que ereden caracteristicas de un MODELO BASE)
 # FIELD es para hacer validaciones.
-from typing import Optional # Importamos para poder indicar que hay valores opcionales
+from typing import Optional, List # Importamos para poder indicar que hay valores opcionales, LIST es para optener respuestas en formato de Lista
 
 app = FastAPI() 
 app.title = 'Mi First API con FastAPI' 
@@ -17,7 +17,7 @@ class Movie(BaseModel):# Luego indicamos las caracteristicas de esta clase (Asi 
 
     overview: str = Field(min_length= 15, max_length= 50)
     year: int = Field(le= 2024) #Para el caso de definir un rango en valores INT (Enteros) usamos 'LE'
-    rating: float = Field(le= 10)
+    rating: float = Field(ge = 1, le= 10)# Asi como LE determina '>=', GE determina '>='
     category: str 
 
     class Config: # Creamos una Clase con un esquema extra en la cual colocamos los valores predeterminados de lso parametros de la clase anterior, esto remplaza el varo por defencto que colocamos en FIELD.
@@ -59,28 +59,30 @@ movies = [
 ]
 
 
-@app.get('/movies',tags=['MOVIES'])
+@app.get('/movies',tags=['MOVIES'], response_model = List[Movie]) # Con 'response_model' indicamos el formato de respuesta que queremos y con 'LIST' indicamos que tipo de lista queremos.
 def get_movies():
-    return movies
+    return JSONResponse(content=movies) # Instauramos JSONResponse y le pasamos como parametro al contenido
 
 @app.get('/movies/{id}', tags=['MOVIES'])
-def get_movie(id: int): 
+def get_movie(id: int = Path(ge=1,le=2000)) -> Movie: # De esta forma podemos validar el parametro id, usando GE y LE como en ejemplos anteriores.
+    # De igual forma que en la ruta anterior podemos definir el tipo de respuesta desde la función con '-> Movie' Solo que aqui no seria una Lista de Peliculas sino solo una. 
     for item in movies:
         if item['id'] == id:
-            return item 
-    return 'ID invalido'
+            return JSONResponse(content=item) 
+    return JSONResponse(content='ID invalido')
 
-@app.get('/movies/', tags=['MOVIES'])
-def get_movies_by_category(category: str):
-    return [item for item in movies if item['category'] == category]
+@app.get('/movies/', tags=['MOVIES'], response_model = List[Movie])
+def get_movies_by_category(category: str =  Query(min_length = 5, max_length =15 )):# Con QUERY validamos datos de los parametros
+    data = [item for item in movies if item['category'] == category]
+    return JSONResponse(content=data)
 
-@app.post('/movies', tags=['MOVIES'])
+@app.post('/movies', tags=['MOVIES'], response_model= dict) # Aqui usamos 'response_model' para indicar que la respuesta es un Diccionario.
 def create_movie(movie: Movie): # De la misma forma que indicamos el tipo de parametro podemos pasarle una clase como tipo de parametro de tal forma que 'movie: Movie' indica que el parametro movie es de la clase Movie. (Es como instaurarlo)
 
     movies.append(movie) # Agregamos a la lista 'movies' el objeto 'movie', aqui solo pasamos ese parametro y nos ahorramos colocar todos las caracteristicas.
-    return movies
+    return JSONResponse(content= {'message':'Se ha registrado la pelicula'}) # Asi podemos usar JSONResponse para dar un mensaje por pantalla.
 
-@app.put('/movies/{id}', tags=['MOVIES'])
+@app.put('/movies/{id}', tags=['MOVIES'], response_model= dict)
 def update_movies(id: int, movie: Movie): # Nuevamente instauramos el objeto 'movie' de la clase 'Movie', dejamos el parametro ID por que ese si lo necesitamos como parametro de filtro
     for item in movies: 
         if item['id'] == id: 
@@ -89,15 +91,15 @@ def update_movies(id: int, movie: Movie): # Nuevamente instauramos el objeto 'mo
             item['year'] = movie.year
             item['rating'] = movie.rating
             item['category'] = movie.category 
-            return movies
+            return JSONResponse(content= {'message':'Se ha modificado la pelicula'})
     return 'ID invalido'
 
-@app.delete('/movie{id}', tags=['MOVIES'])
+@app.delete('/movie{id}', tags=['MOVIES'], response_model= dict)
 def delete_movie(id: int):
     for item in movies: 
         if item['id'] == id: 
             movies.remove(item)
-            return movies
+            return JSONResponse(content= {'message':'Se ha eliminado la pelicula'})
     return 'ID invalido' 
 
 
