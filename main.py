@@ -102,7 +102,7 @@ def delete_movie(id: int):
             return JSONResponse(content= {'message':'Se ha eliminado la pelicula'})
     return 'ID invalido' 
 
-
+#ASTA AQUI CODIGO COMENTADO, CONTINUA EN MASTER
 
 
 
