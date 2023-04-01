@@ -4,11 +4,16 @@ from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import HTMLResponse, JSONResponse 
 from pydantic import BaseModel, Field 
 from typing import Optional, List 
+from jwt_manager import create_token
 
 app = FastAPI() 
 app.title = 'Mi First API con FastAPI' 
 app.version = '0.0.1' 
 
+# Creamos una Clase USUARIO par que se pueda registrar
+class User(BaseModel): 
+    email: str # Pasamos los parametros 'email' y 'password' 
+    password: str
 
 class Movie(BaseModel):
     id: Optional[int] = None 
@@ -35,6 +40,12 @@ class Movie(BaseModel):
 @app.get('/', tags=['HOME']) 
 def message():
     return HTMLResponse('<h1>HOLA MUNDO</h1>')
+
+@app.post('/login', tags=['Auth']) # Creamos la ruta Login para que se registre
+def login(user: User):# Creamos la función eh istanciamos el parametro user en la clase User ( user: User).
+    if user.email == 'admin@gmail.com' and user.password == 'admin':
+        token: str = create_token(user.dict())
+    return JSONResponse(content=token, status_code=200)
 
 movies = [
     {
