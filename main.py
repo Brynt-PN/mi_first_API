@@ -45,7 +45,8 @@ def message():
 def login(user: User):# Creamos la función eh istanciamos el parametro user en la clase User ( user: User).
     if user.email == 'admin@gmail.com' and user.password == 'admin':
         token: str = create_token(user.dict())
-    return JSONResponse(content=token, status_code=200)
+        return JSONResponse(content=token, status_code=200)
+    return JSONResponse(status_code=400,content='User or password invalido')
 
 movies = [
     {
