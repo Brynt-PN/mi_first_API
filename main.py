@@ -1,10 +1,11 @@
 #CODIGO COMENTADO DE INTRODUCCIÓN EN LA RAMA INT
 #CODIGO COMENTADO DE INTERMEDIO EN LA RAMA MED
-from fastapi import FastAPI, Body, Path, Query 
+from fastapi import FastAPI, Body, Path, Query, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse 
 from pydantic import BaseModel, Field 
 from typing import Optional, List 
-from jwt_manager import create_token
+from jwt_manager import create_token, validate_token
+from fastapi.security import HTTPBearer
 
 app = FastAPI() 
 app.title = 'Mi First API con FastAPI' 
@@ -14,6 +15,13 @@ app.version = '0.0.1'
 class User(BaseModel): 
     email: str # Pasamos los parametros 'email' y 'password' 
     password: str
+
+class JWTBearer(HTTPBearer):
+    async def __call__(self, request: Request):
+        auth = await super().__call__(request)
+        data = validate_token(auth.credentials)
+        if data['email'] != 'admin@gmail.com':
+            raise HTTPException(status_code=403, detail='Credenciales invalidas')
 
 class Movie(BaseModel):
     id: Optional[int] = None 
